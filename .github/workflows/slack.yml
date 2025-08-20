@@ -1,74 +1,24 @@
-name: Slack Notifications
-
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-
-jobs:
-  notify:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Run Tests (example)
-        run: |
-          echo "Running tests..."
-          sleep 3
-          # exit 1  # Uncomment to simulate failure
-
-      - name: Notify Slack
-        if: always()
-        uses: slackapi/slack-github-action@v1.27.0
-        with:
-          payload: |
-            {
-              "text": "*GitHub Action Notification*",
-              "attachments": [
-                {
-                  "color": "${{ job.status == 'success' && 'good' || 'danger' }}",
-                  "fields": [
-                    {
-                      "title": "Job Name",
-                      "value": "${{ github.job }}",
-                      "short": true
-                    },
-                    {
-                      "title": "Git URL",
-                      "value": "https://github.com/${{ github.repository }}",
-                      "short": true
-                    },
-                    {
-                      "title": "Git Branch",
-                      "value": "${{ github.ref_name }}",
-                      "short": true
-                    },
-                    {
-                      "title": "Commit ID",
-                      "value": "${{ github.sha }}",
-                      "short": true
-                    },
-                    {
-                      "title": "Git Commit Author",
-                      "value": "${{ github.actor }}",
-                      "short": true
-                    },
-                    {
-                      "title": "Git Commit Message",
-                      "value": "${{ github.event.head_commit.message }}",
-                      "short": false
-                    },
-                    {
-                      "title": "STATUS",
-                      "value": "${{ job.status }}",
-                      "short": true
-                    }
-                  ]
-                }
-              ]
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+- name: Notify Slack
+  if: always()
+  uses: slackapi/slack-github-action@v1.27.0
+  with:
+    payload: |
+      {
+        "text": "*GitHub Action Notification*",
+        "attachments": [
+          {
+            "color": "${{ job.status == 'success' && 'good' || 'danger' }}",
+            "fields": [
+              { "title": "Job Name", "value": "${{ github.job }}", "short": true },
+              { "title": "Git URL", "value": "https://github.com/${{ github.repository }}", "short": true },
+              { "title": "Git Branch", "value": "${{ github.ref_name }}", "short": true },
+              { "title": "Commit ID", "value": "${{ github.sha }}", "short": true },
+              { "title": "Git Commit Author", "value": "${{ github.actor }}", "short": true },
+              { "title": "Git Commit Message", "value": "${{ github.event.head_commit.message || 'No message' | replace('\n',' ') }}", "short": false },
+              { "title": "STATUS", "value": "${{ job.status }}", "short": true }
+            ]
+          }
+        ]
+      }
+  env:
+    SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
