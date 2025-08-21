@@ -80,7 +80,7 @@ jobs:
                     { "title": "Repository", "value": "${{ github.repository }}", "short": true },
                     { "title": "Branch", "value": "${{ github.ref_name }}", "short": true },
                     { "title": "Actor", "value": "${{ github.actor }}", "short": true },
-                    { "title": "Commit", "value": "${{ github.sha.substr(0,7) }}", "short": true },
+                    { "title": "Commit", "value": "${{ env.SHORT_SHA }}", "short": true },
                     { "title": "Message", "value": "${{ github.event.head_commit.message }}" }
                   ]
                 }
@@ -104,7 +104,7 @@ jobs:
                     { "title": "Repository", "value": "${{ github.repository }}", "short": true },
                     { "title": "Branch", "value": "${{ github.ref_name }}", "short": true },
                     { "title": "Actor", "value": "${{ github.actor }}", "short": true },
-                    { "title": "Commit", "value": "${{ github.sha.substr(0,7) }}", "short": true },
+                    { "title": "Commit", "value": "${{ env.SHORT_SHA }}", "short": true },
                     { "title": "Message", "value": "${{ github.event.head_commit.message }}" }
                   ]
                 }
