@@ -14,6 +14,9 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      - name: Set Short SHA
+        run: echo "SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_ENV
+
       - name: Notify Slack on Start
         if: always()
         uses: slackapi/slack-github-action@v1.27.0
@@ -23,6 +26,7 @@ jobs:
               "text": ":rocket: A workflow has started!",
               "attachments": [
                 {
+                  "fallback": "Workflow started - repo: ${{ github.repository }}, branch: ${{ github.ref_name }}",
                   "color": "#439FE0",
                   "fields": [
                     { "title": "Repository", "value": "${{ github.repository }}", "short": true },
@@ -36,29 +40,6 @@ jobs:
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-
-      # - name: Notify Slack on Start
-      #   if: always()
-      #   uses: slackapi/slack-github-action@v1.27.0
-      #   with:
-      #     payload-templated: |
-      #       {
-      #         "text": ":rocket: A workflow has started!",
-      #         "attachments": [
-      #           {
-      #             "color": "#439FE0",
-      #             "fields": [
-      #               { "title": "Repository", "value": "${{ github.repository }}", "short": true },
-      #               { "title": "Branch", "value": "${{ github.ref_name }}", "short": true },
-      #               { "title": "Actor", "value": "${{ github.actor }}", "short": true },
-      #               { "title": "Commit", "value": "${{ github.sha.substr(0,7) }}", "short": true },
-      #               { "title": "Message", "value": "${{ github.event.head_commit.message }}" }
-      #             ]
-      #           }
-      #         ]
-      #       }
-      #   env:
-      #     SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
       - name: Run Tests (example)
         run: |
@@ -75,6 +56,7 @@ jobs:
               "text": ":white_check_mark: Workflow succeeded!",
               "attachments": [
                 {
+                  "fallback": "Workflow succeeded - repo: ${{ github.repository }}, branch: ${{ github.ref_name }}",
                   "color": "good",
                   "fields": [
                     { "title": "Repository", "value": "${{ github.repository }}", "short": true },
@@ -98,6 +80,7 @@ jobs:
               "text": ":x: Workflow failed!",
               "attachments": [
                 {
+                  "fallback": "Workflow failed - repo: ${{ github.repository }}, branch: ${{ github.ref_name }}",
                   "color": "danger",
                   "fields": [
                     { "title": "Job", "value": "${{ github.job }}", "short": true },
