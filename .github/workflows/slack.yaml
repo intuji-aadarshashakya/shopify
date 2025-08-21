@@ -9,6 +9,7 @@ on:
 jobs:
   notify:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -21,6 +22,7 @@ jobs:
         uses: slackapi/slack-github-action@v2.0.0
         with:
           webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
           payload-templated: "true"
           payload: |
             {
@@ -30,6 +32,63 @@ jobs:
                   "fallback": "Workflow started - repo: ${{ github.repository }}, branch: ${{ github.ref_name }}",
                   "color": "#439FE0",
                   "fields": [
+                    { "title": "Repository", "value": "${{ github.repository }}", "short": true },
+                    { "title": "Branch", "value": "${{ github.ref_name }}", "short": true },
+                    { "title": "Actor", "value": "${{ github.actor }}", "short": true },
+                    { "title": "Commit", "value": "${{ env.SHORT_SHA }}", "short": true },
+                    { "title": "Message", "value": "${{ github.event.head_commit.message }}" }
+                  ]
+                }
+              ]
+            }
+
+      - name: Run Tests (example)
+        run: |
+          echo "Running tests..."
+          sleep 5
+          # exit 1   # Uncomment to test failure notification
+
+      - name: Notify Slack on Success
+        if: success()
+        uses: slackapi/slack-github-action@v2.0.0
+        with:
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
+          payload-templated: "true"
+          payload: |
+            {
+              "text": ":white_check_mark: Workflow succeeded",
+              "attachments": [
+                {
+                  "fallback": "Workflow succeeded - repo: ${{ github.repository }}, branch: ${{ github.ref_name }}",
+                  "color": "good",
+                  "fields": [
+                    { "title": "Repository", "value": "${{ github.repository }}", "short": true },
+                    { "title": "Branch", "value": "${{ github.ref_name }}", "short": true },
+                    { "title": "Actor", "value": "${{ github.actor }}", "short": true },
+                    { "title": "Commit", "value": "${{ env.SHORT_SHA }}", "short": true },
+                    { "title": "Message", "value": "${{ github.event.head_commit.message }}" }
+                  ]
+                }
+              ]
+            }
+
+      - name: Notify Slack on Failure
+        if: failure()
+        uses: slackapi/slack-github-action@v2.0.0
+        with:
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
+          payload-templated: "true"
+          payload: |
+            {
+              "text": ":x: Workflow failed",
+              "attachments": [
+                {
+                  "fallback": "Workflow failed - repo: ${{ github.repository }}, branch: ${{ github.ref_name }}",
+                  "color": "danger",
+                  "fields": [
+                    { "title": "Job", "value": "${{ github.job }}", "short": true },
                     { "title": "Repository", "value": "${{ github.repository }}", "short": true },
                     { "title": "Branch", "value": "${{ github.ref_name }}", "short": true },
                     { "title": "Actor", "value": "${{ github.actor }}", "short": true },
