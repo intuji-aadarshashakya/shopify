@@ -1,4 +1,4 @@
-name: Notify Slack on CI
+name: Slack Notifications
 
 on:
   push:
@@ -10,23 +10,32 @@ jobs:
   notify:
     runs-on: ubuntu-latest
     steps:
-      - name: Send notification to Slack
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set Short SHA
+        run: echo "SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_ENV
+
+      - name: Notify Slack on Start
+        if: always()
         uses: slackapi/slack-github-action@v2.0.0
         with:
-          channel-id: ${{ secrets.SLACK_CHANNEL_ID }}
-          slack-message: |
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          payload-templated: "true"
+          payload: |
             {
-              "text": "🚀 *GitHub Action Triggered*",
-              "blocks": [
+              "text": ":rocket: Workflow started",
+              "attachments": [
                 {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "*Repository:* ${{ github.repository }}\n*Branch:* ${{ github.ref_name }}\n*Commit:* ${{ github.sha }}\n*Message:* ${{ github.event.head_commit.message || 'No message' }}"
-                  }
+                  "fallback": "Workflow started - repo: ${{ github.repository }}, branch: ${{ github.ref_name }}",
+                  "color": "#439FE0",
+                  "fields": [
+                    { "title": "Repository", "value": "${{ github.repository }}", "short": true },
+                    { "title": "Branch", "value": "${{ github.ref_name }}", "short": true },
+                    { "title": "Actor", "value": "${{ github.actor }}", "short": true },
+                    { "title": "Commit", "value": "${{ env.SHORT_SHA }}", "short": true },
+                    { "title": "Message", "value": "${{ github.event.head_commit.message }}" }
+                  ]
                 }
               ]
             }
-          payload-templated: "true"
-        env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
