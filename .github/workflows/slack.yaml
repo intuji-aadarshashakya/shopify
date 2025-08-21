@@ -14,7 +14,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Set Short SHA
+      - name: Set short SHA
         run: echo "SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_ENV
 
       - name: Notify Slack on Start
@@ -26,14 +26,13 @@ jobs:
               "text": ":rocket: A workflow has started!",
               "attachments": [
                 {
-                  "fallback": "Workflow started - repo: ${{ github.repository }}, branch: ${{ github.ref_name }}",
                   "color": "#439FE0",
                   "fields": [
                     { "title": "Repository", "value": "${{ github.repository }}", "short": true },
                     { "title": "Branch", "value": "${{ github.ref_name }}", "short": true },
                     { "title": "Actor", "value": "${{ github.actor }}", "short": true },
                     { "title": "Commit", "value": "${{ env.SHORT_SHA }}", "short": true },
-                    { "title": "Message", "value": "${{ github.event.head_commit.message }}" }
+                    { "title": "Message", "value": "${{ github.event.head_commit.message || github.event.pull_request.title || 'N/A' }}" }
                   ]
                 }
               ]
@@ -56,14 +55,13 @@ jobs:
               "text": ":white_check_mark: Workflow succeeded!",
               "attachments": [
                 {
-                  "fallback": "Workflow succeeded - repo: ${{ github.repository }}, branch: ${{ github.ref_name }}",
                   "color": "good",
                   "fields": [
                     { "title": "Repository", "value": "${{ github.repository }}", "short": true },
                     { "title": "Branch", "value": "${{ github.ref_name }}", "short": true },
                     { "title": "Actor", "value": "${{ github.actor }}", "short": true },
                     { "title": "Commit", "value": "${{ env.SHORT_SHA }}", "short": true },
-                    { "title": "Message", "value": "${{ github.event.head_commit.message }}" }
+                    { "title": "Message", "value": "${{ github.event.head_commit.message || github.event.pull_request.title || 'N/A' }}" }
                   ]
                 }
               ]
@@ -80,7 +78,6 @@ jobs:
               "text": ":x: Workflow failed!",
               "attachments": [
                 {
-                  "fallback": "Workflow failed - repo: ${{ github.repository }}, branch: ${{ github.ref_name }}",
                   "color": "danger",
                   "fields": [
                     { "title": "Job", "value": "${{ github.job }}", "short": true },
@@ -88,7 +85,7 @@ jobs:
                     { "title": "Branch", "value": "${{ github.ref_name }}", "short": true },
                     { "title": "Actor", "value": "${{ github.actor }}", "short": true },
                     { "title": "Commit", "value": "${{ env.SHORT_SHA }}", "short": true },
-                    { "title": "Message", "value": "${{ github.event.head_commit.message }}" }
+                    { "title": "Message", "value": "${{ github.event.head_commit.message || github.event.pull_request.title || 'N/A' }}" }
                   ]
                 }
               ]
